@@ -23,8 +23,9 @@ def transform_dataframe_to_json(dataframe):
 app = FastAPI()
 
 
-@app.get("/extraction")
-async def extraction():
+# @app.get("/extraction")
+# async 
+def extraction():
     degrees_patterns_path = 'Resources/data/degrees.jsonl'
     majors_patterns_path = 'Resources/data/majors.jsonl'
     skills_patterns_path = 'Resources/data/skills.jsonl'
@@ -60,8 +61,9 @@ def modifying_type_job(jobs):
     return jobs
 
 
-@app.get("/matching")
-async def matching():
+# @app.get("/matching")
+# async 
+def matching():
     with open('Resources/data/labels.json') as fp:
         labels = json.load(fp)
     jobs = pd.read_csv('Resources/data/job_description_by_spacy.csv', index_col=0)
@@ -73,7 +75,7 @@ async def matching():
     resumes_matched_jobs = pd.DataFrame()
     for job_index in job_indexes:
         resumes_matched = rules.matching_score(resumes, jobs, job_index)
-        resumes_matched_jobs = resumes_matched_jobs.append(resumes_matched)
+        resumes_matched_jobs = resumes_matched_jobs._append(resumes_matched)
 
         # adding matched resumes to database
         for i, row in resumes_matched.iterrows():
@@ -91,18 +93,22 @@ async def matching():
                                                 if skills_semantic_matching else 0,
                                                 matching_score=matching_score if matching_score else 0)
             matched_resume = jsonable_encoder(matched_resume)
-            new_matched_resume = await database.get_collection("matches").insert_one(matched_resume)
+            #new_matched_resume = await database.get_collection("matches").insert_one(matched_resume)
 
     resumes_matched_json = transform_dataframe_to_json(resumes_matched_jobs)
     return resumes_matched_json
 
 
-@app.get("/top_resumes")
-async def extraction():
+# @app.get("/top_resumes")
+# async 
+def extraction():
     top_resumes = database.matches.find().sort("matching_score", -1).limit(5)
     result = []
-    top_resumes = await top_resumes.to_list(None)
+    #top_resumes = await top_resumes.to_list(None)
     for x in top_resumes:
         result.append(x)
     top_resumes_json = jsonable_encoder(result)
     return top_resumes_json
+
+result = matching()
+print(result)
